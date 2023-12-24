@@ -1,5 +1,7 @@
-// phase 2 - using graphEditor
+// phase 2 - using graphEditor & viewport
 const myCanvas = document.getElementById("mycanvas");
+const saveBtn = document.getElementById("save-btn");
+const deleteBtn = document.getElementById("delete-btn");
 
 myCanvas.width = 800;
 myCanvas.height = 800;
@@ -38,11 +40,13 @@ function updateCanvas() {
   requestAnimationFrame(updateCanvas);
 }
 
+// button event handlers
 function dispose() {
   graphEditor.dispose();
   localStorage.removeItem("graph");
 }
-
 function save() {
   localStorage.setItem("graph", JSON.stringify(graph));
 }
+saveBtn.addEventListener("click", save);
+deleteBtn.addEventListener("click", dispose);
