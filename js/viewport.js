@@ -18,11 +18,14 @@ class Viewport {
 
     this.#eventListener();
   }
-  getMouse(e) {
-    return new Point(
+  getMouse(e, shouldSubtractDragOffset = false) {
+    // address issue when the line intent doesn't match with cursor when we use pan movement
+    const p = new Point(
       (e.offsetX - this.center.x) * this.zoom - this.offset.x,
       (e.offsetY - this.center.y) * this.zoom - this.offset.y
     );
+
+    return shouldSubtractDragOffset ? subtractOffset(p, this.drag.offset) : p;
   }
 
   getOffset() {
@@ -50,6 +53,7 @@ class Viewport {
 
   #handleMouseUp() {
     this.logger.log("mouse up");
+    this.canvas.style.cursor = "default";
     if (this.drag.active) {
       // update the offset
       this.offset = addOffset(this.offset, this.drag.offset); // util function
@@ -67,6 +71,7 @@ class Viewport {
   #handleMouseDown(e) {
     if (e.button == 1) {
       // middle button
+      this.canvas.style.cursor = "grab";
       this.logger.log("mouse down - middle button click");
       this.drag.start = this.getMouse(e);
       this.drag.active = true;
@@ -79,5 +84,16 @@ class Viewport {
       this.drag.end = this.getMouse(e);
       this.drag.offset = subtractOffset(this.drag.end, this.drag.start); // util function
     }
+  }
+
+  // reset will be called in updateCanvas() so its' fine to place ctx.restore() first
+  reset() {
+    this.ctx.restore();
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.save();
+    this.ctx.translate(this.center.x, this.center.y); // make sure zoom on the center
+    this.ctx.scale(1 / this.zoom, 1 / this.zoom);
+    const offset = this.getOffset(); // to see immediate pan movement
+    this.ctx.translate(offset.x, offset.y);
   }
 }

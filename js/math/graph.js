@@ -5,6 +5,22 @@ class Graph {
     this.segments = segments;
   }
 
+  // static method  belongs to the class not the instance
+  // loading graph info from local storage
+  static load(info) {
+    const points = info.points.map((p) => new Point(p.x, p.y));
+    const segments = info.segments.map(
+      (seg) =>
+        new Segment(
+          points.find((p) => p.equals(seg.p1)),
+          points.find((p) => p.equals(seg.p2))
+        )
+    );
+    // the p1 and p2 inside segments aren't really Point it's an object
+    // new Segment(segment.p1, segment.p2)) won't work
+    return new Graph(points, segments);
+  }
+
   addPoint(newpoint) {
     this.points.push(newpoint);
   }
