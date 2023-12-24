@@ -1,9 +1,11 @@
 console.log("editor!");
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Private_properties
 class GraphEditor {
-  constructor(canvas, graph) {
-    this.canvas = canvas;
+  constructor(viewport, graph, logger) {
+    this.viewport = viewport;
+    this.canvas = viewport.canvas;
     this.graph = graph;
+    this.logger = logger;
 
     this.ctx = this.canvas.getContext("2d");
 
@@ -23,15 +25,23 @@ class GraphEditor {
   }
 
   #handleMouseMove(e) {
-    this.mousePoint = new Point(e.offsetX, e.offsetY);
-    this.hoveredPoint = getNearestPoint(this.mousePoint, this.graph.points, 10);
+    //this.mousePoint = new Point(e.offsetX, e.offsetY);
+    this.mousePoint = this.viewport.getMouse(e);
+    this.hoveredPoint = getNearestPoint(
+      this.mousePoint,
+      this.graph.points,
+      10 * this.viewport.zoom
+    );
     if (this.dragging) {
       this.selectedPoint.x = this.mousePoint.x;
       this.selectedPoint.y = this.mousePoint.y;
+
+      this.logger.log("mouse move: dragging ");
     }
   }
   #handleMouseDown(e) {
     if (e.button === 2) {
+      this.logger.log("mouse down - right click");
       // 0 = left; 1 = middle ; 2 = right
       // on right click, we want to delete the node
       if (this.selectedPoint) {
@@ -42,6 +52,7 @@ class GraphEditor {
     }
     // left click
     if (e.button === 0) {
+      this.logger.log("mouse down - left click");
       // if this hoveredPoint is greater than the threshold then it's null
       if (this.hoveredPoint) {
         // add segment between existing points

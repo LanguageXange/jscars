@@ -20,13 +20,22 @@ const seg4 = new Segment(p3, p4);
 const segments = [seg1, seg2, seg3, seg4];
 
 const graph = new Graph(points, segments);
-const graphEditor = new GraphEditor(myCanvas, graph);
+const logger = new Logger(myCanvas, document.getElementById("action")); // for logging
+
+const viewport = new Viewport(myCanvas, logger);
+const graphEditor = new GraphEditor(viewport, graph, logger);
 
 updateCanvas();
 
 function updateCanvas() {
   //console.log("update canvas!");
   ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+  ctx.save();
+  ctx.translate(viewport.center.x, viewport.center.y); // make sure zoom on the center
+  ctx.scale(1 / viewport.zoom, 1 / viewport.zoom);
+  const offset = viewport.getOffset(); // to see immediate pan movement
+  ctx.translate(offset.x, offset.y);
   graphEditor.display();
+  ctx.restore();
   requestAnimationFrame(updateCanvas);
 }
