@@ -47,6 +47,7 @@ function updateCanvas() {
   // next step - generate world
   world.generate();
   world.draw(ctx);
+  // ctx.globalAlpha = 0.5; // add transparency
   graphEditor.display();
 
   requestAnimationFrame(updateCanvas);

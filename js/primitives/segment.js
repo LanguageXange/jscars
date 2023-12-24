@@ -5,8 +5,14 @@ class Segment {
     this.p2 = p2;
   }
 
+  getLength() {
+    return calculateDistance(this.p1, this.p2);
+  }
+  directionVector() {
+    return normalize(subtractOffset(this.p2, this.p1));
+  }
   // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-  draw(ctx, { width = 2, color = "blue", dashed = [] } = {}) {
+  draw(ctx, { width = 2, color = "#dcdcdc90", dashed = [] } = {}) {
     ctx.beginPath();
     ctx.lineWidth = width;
     ctx.strokeStyle = color;

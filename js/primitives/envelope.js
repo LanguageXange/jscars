@@ -1,7 +1,7 @@
 console.log("envelop");
 class Envelope {
   // draw road based on segment aka skeleton
-  constructor(skeleton, width, roundness = 1) {
+  constructor(skeleton, width, roundness = 0) {
     this.skeleton = skeleton;
 
     this.poly = this.#generatePolygon(width, roundness);
@@ -34,7 +34,8 @@ class Envelope {
     return new Polygon(points);
   }
 
-  draw(ctx) {
-    this.poly.draw(ctx);
+  draw(ctx, options) {
+    this.poly.draw(ctx, options);
+    // this.poly.drawSegments(ctx); // for seeing different segments to make sure we are breaking the intersection into different segments
   }
 }
