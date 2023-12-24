@@ -15,3 +15,19 @@ body {
   border: 1px solid #fff;
   font-size: 1.25rem;
 }
+
+button {
+  margin: 20px;
+  padding: 10px 20px;
+  font-size: 1.25rem;
+  border: none;
+  outline: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+#save-btn:hover {
+  background-color: rgb(47, 186, 221);
+}
+#delete-btn:hover {
+  background-color: rgba(208, 78, 46, 0.929);
+}

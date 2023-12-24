@@ -1,4 +1,6 @@
-// phase 2 - using graphEditor & viewport
+// step 2 - using graphEditor & viewport
+console.log("script 2");
+
 const myCanvas = document.getElementById("mycanvas");
 const saveBtn = document.getElementById("save-btn");
 const deleteBtn = document.getElementById("delete-btn");
@@ -24,6 +26,8 @@ const graphInfo = graphString ? JSON.parse(graphString) : null;
 
 const graph = graphInfo ? Graph.load(graphInfo) : new Graph();
 
+const world = new World(graph);
+
 const logger = new Logger(myCanvas, document.getElementById("action")); // for logging
 
 const viewport = new Viewport(myCanvas, logger);
@@ -35,6 +39,14 @@ function updateCanvas() {
   //console.log("update canvas!");
 
   viewport.reset();
+
+  // next step - generate roads
+  // new Polygon(graph.points).draw(ctx); // for testing polygon
+  // new Envelope(graph.segments[0], 80).draw(ctx); // for testing
+
+  // next step - generate world
+  world.generate();
+  world.draw(ctx);
   graphEditor.display();
 
   requestAnimationFrame(updateCanvas);

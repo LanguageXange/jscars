@@ -1,4 +1,4 @@
-// phase one - write simple functions and interfaces ( buttons )
+// step one - write simple functions and interfaces ( buttons )
 
 const myCanvas = document.getElementById("mycanvas");
 

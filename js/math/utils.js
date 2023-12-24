@@ -37,3 +37,16 @@ function subtractOffset(p1, p2) {
 function scale(p, scaler) {
   return new Point(p.x * scaler, p.y * scaler);
 }
+
+// for envelope.js
+
+function translate(point, angle, offset) {
+  return new Point(
+    point.x + Math.cos(angle) * offset,
+    point.y + Math.sin(angle) * offset
+  );
+}
+
+function getAngle(p) {
+  return Math.atan2(p.y, p.x);
+}
