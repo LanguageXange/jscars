@@ -1,9 +1,9 @@
 class Tree {
-  constructor(centerPoint, size, heightCoefficient = 0.5) {
+  constructor(centerPoint, size, heightCoefficient = 0.3) {
     this.centerPoint = centerPoint;
     this.size = size; // size of the base
     this.heightCoefficient = heightCoefficient;
-    this.base = this.#generateLevel(centerPoint, size);
+    this.base = this.#generateLevel(centerPoint, size); // also a Polygon
   }
   #generateLevel(point, size) {
     const points = [];
@@ -35,7 +35,7 @@ class Tree {
       const size = lerp(this.size, 40, t);
       //   point.draw(ctx, { size, color });
       const poly = this.#generateLevel(point, size);
-      poly.draw(ctx, { fill: color, stroke: "rgba(0,0,0,0.25)" });
+      poly.draw(ctx, { fill: color, stroke: "rgba(0,200,0,0.25)" });
     }
 
     // this.base.draw(ctx); // base of the tree - we can use this for detecting collisions

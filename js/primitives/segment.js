@@ -23,6 +23,7 @@ class Segment {
     return Math.min(distToP1, distToP2);
   }
 
+  // formula explained here -  https://www.youtube.com/watch?v=jvqomjmMsPI
   projectPoint(point) {
     const a = subtractOffset(point, this.p1);
     const b = subtractOffset(this.p2, this.p1);

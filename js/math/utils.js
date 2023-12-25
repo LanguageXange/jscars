@@ -7,6 +7,22 @@ function calculateDistance(p1, p2) {
   return Math.hypot(xDiff, yDiff);
 }
 
+// for stopEditor.js
+function getNearestSegment(currentPoint, segArr, threshold = Infinity) {
+  let minDist = Infinity;
+  let nearest = null;
+
+  for (const seg of segArr) {
+    const dist = seg.distanceToPoint(currentPoint); // distanceToPoint is a method in Segment.js
+    if (dist < minDist && dist <= threshold) {
+      minDist = dist;
+      nearest = seg;
+    }
+  }
+
+  return nearest;
+}
+
 // for graphEditor.js
 function getNearestPoint(currentPoint, pointsArr, threshold = Infinity) {
   // calculate the min distance

@@ -15,13 +15,35 @@ class GraphEditor {
     this.dragging = false;
     this.#eventListener(); // private method
   }
+
+  enable() {
+    this.#eventListener();
+  }
+
+  disable() {
+    this.#removeListener();
+    this.selectedPoint = null;
+    this.hoveredPoint = null;
+  }
+
   #eventListener() {
-    this.canvas.addEventListener("mousedown", this.#handleMouseDown.bind(this));
-    // mouse move event - updating point when dragging is true
-    this.canvas.addEventListener("mousemove", (e) => this.#handleMouseMove(e));
-    this.canvas.addEventListener("mouseup", () => (this.dragging = false));
+    this.boundMouseDown = this.#handleMouseDown.bind(this);
+    this.boundMouseMove = this.#handleMouseMove.bind(this);
+    this.boundMouseUp = () => (this.dragging = false);
+    this.boundContextMenu = (e) => e.preventDefault();
+
+    this.canvas.addEventListener("mousedown", this.boundMouseDown);
+    this.canvas.addEventListener("mousemove", this.boundMouseMove);
+    this.canvas.addEventListener("mouseup", this.boundMouseUp);
     // prevent context menu from displaying when we right click
-    this.canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+    this.canvas.addEventListener("contextmenu", this.boundContextMenu);
+  }
+  #removeListener() {
+    // when we remove event listener we should pass in the same function
+    this.canvas.removeEventListener("mousedown", this.boundMouseDown);
+    this.canvas.removeEventListener("mousemove", this.boundMouseMove);
+    this.canvas.removeEventListener("mouseup", this.boundMouseUp);
+    this.canvas.removeEventListener("contextmenu", this.boundContextMenu);
   }
 
   #handleMouseMove(e) {

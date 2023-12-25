@@ -4,6 +4,8 @@ console.log("script 2");
 const myCanvas = document.getElementById("mycanvas");
 const saveBtn = document.getElementById("save-btn");
 const deleteBtn = document.getElementById("delete-btn");
+const graphBtn = document.getElementById("graph-btn");
+const stopBtn = document.getElementById("stop-btn");
 
 myCanvas.width = 800;
 myCanvas.height = 800;
@@ -32,19 +34,20 @@ const logger = new Logger(myCanvas, document.getElementById("action")); // for l
 
 const viewport = new Viewport(myCanvas, logger);
 const graphEditor = new GraphEditor(viewport, graph, logger);
+const stopEditor = new StopEditor(viewport, world); // road markings / stop sign require info from world
 
 let currentGraphHash = graph.hash();
+
+setMode("graph"); // set initial mode to graph editor
+
 updateCanvas();
 
 function updateCanvas() {
   //console.log("update canvas!");
-
   viewport.reset();
-
   // next step - generate roads
   // new Polygon(graph.points).draw(ctx); // for testing polygon
   // new Envelope(graph.segments[0], 80).draw(ctx); // for testing
-
   // next step - (re)generate world but only when things are updated !
   if (graph.hash() !== currentGraphHash) {
     world.generate();
@@ -56,11 +59,40 @@ function updateCanvas() {
   world.draw(ctx, viewPoint);
   ctx.globalAlpha = 0.5; // add transparency so that graphEditor (node and segment is less obvious)
   graphEditor.display();
+  stopEditor.display();
 
   requestAnimationFrame(updateCanvas);
 }
 
 // button event handlers
+
+function setMode(mode) {
+  disableEditors();
+  switch (mode) {
+    case "graph":
+      graphBtn.style.filter = "none";
+      graphBtn.style.background = "#fff";
+      graphEditor.enable();
+      break;
+    case "stop":
+      stopBtn.style.filter = "none";
+      stopBtn.style.background = "#fff";
+      stopEditor.enable();
+      break;
+
+    default:
+      return null;
+  }
+}
+
+function disableEditors() {
+  graphBtn.style.filter = "grayscale(80%)";
+  graphBtn.style.background = "#888";
+  graphEditor.disable();
+  stopBtn.style.background = "#888";
+  stopBtn.style.filter = "grayscale(80%)";
+  stopEditor.disable();
+}
 function dispose() {
   graphEditor.dispose();
   localStorage.removeItem("graph");
@@ -70,3 +102,5 @@ function save() {
 }
 saveBtn.addEventListener("click", save);
 deleteBtn.addEventListener("click", dispose);
+graphBtn.addEventListener("click", () => setMode("graph"));
+stopBtn.addEventListener("click", () => setMode("stop"));

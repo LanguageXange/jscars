@@ -1,5 +1,5 @@
 class Building {
-  constructor(basePoly, heightCoef = 0.4) {
+  constructor(basePoly, heightCoef = 0.2) {
     this.base = basePoly;
     this.heightCoef = heightCoef;
   }
@@ -23,10 +23,17 @@ class Building {
       ]);
       sides.push(poly);
     }
+
+    // address weird sides issue by sorting the sides poly according to the viewpoint
+    // the closer one will be the last one to be drawn
+    sides.sort(
+      (a, b) =>
+        b.polyDistanceToPoint(viewPoint) - a.polyDistanceToPoint(viewPoint)
+    );
     this.base.draw(ctx, { fill: "#fff", stroke: "#333" });
     for (const side of sides) {
-      side.draw(ctx);
+      side.draw(ctx, { fill: "#dcdcdc" });
     }
-    ceiling.draw(ctx, { fill: "#fff", stroke: "#333" });
+    ceiling.draw(ctx, { fill: "#ff6666", stroke: "#000" });
   }
 }

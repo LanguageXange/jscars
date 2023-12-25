@@ -220,14 +220,15 @@ class World {
       seg.draw(ctx, { color: "#fff", width: 4, dashed: [8, 10] });
     }
 
-    // draw building (pseudo 3D effect )
-    for (const build of this.buildings) {
-      build.draw(ctx, viewPoint);
-    }
-
-    // draw trees (pseudo 3D effect )
-    for (const tree of this.trees) {
-      tree.draw(ctx, viewPoint);
+    // draw building and trees with pseudo 3D effect and in the correct order
+    const items = [...this.buildings, ...this.trees]; // both build and tree have `this.base`
+    items.sort(
+      (a, b) =>
+        b.base.polyDistanceToPoint(viewPoint) -
+        a.base.polyDistanceToPoint(viewPoint)
+    );
+    for (const item of items) {
+      item.draw(ctx, viewPoint);
     }
   }
 }
