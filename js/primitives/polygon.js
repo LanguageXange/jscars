@@ -85,6 +85,9 @@ class Polygon {
     return false;
   }
 
+  distanceToPoly(poly) {
+    return Math.min(...this.points.map((p) => poly.polyDistanceToPoint(p)));
+  }
   polyDistanceToPoint(p) {
     return Math.min(...this.segments.map((s) => s.distanceToPoint(p)));
   }

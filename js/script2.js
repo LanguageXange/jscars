@@ -51,7 +51,9 @@ function updateCanvas() {
     currentGraphHash = graph.hash();
   }
 
-  world.draw(ctx);
+  // viewPoint is for pseudo 3d effect
+  const viewPoint = scale(viewport.getOffset(), -1);
+  world.draw(ctx, viewPoint);
   ctx.globalAlpha = 0.5; // add transparency so that graphEditor (node and segment is less obvious)
   graphEditor.display();
 

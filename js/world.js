@@ -106,9 +106,13 @@ class World {
     }
 
     // fixing building collisions by removing the adjacent building if it intersects
+    let eps = 0.001; // to address floating point issue
     for (let i = 0; i < bases.length - 1; i++) {
       for (let j = i + 1; j < bases.length; j++) {
-        if (bases[i].isIntersectsWith(bases[j])) {
+        if (
+          bases[i].isIntersectsWith(bases[j]) ||
+          bases[i].distanceToPoly(bases[j]) < this.spacing - eps // ensure buildings are not super close on a straight line with multiple subsegments
+        ) {
           bases.splice(j, 1); // splice will shift the index so need to decrement j by one
           j--;
         }
@@ -121,7 +125,7 @@ class World {
     return bases;
   }
 
-  #generateTrees(count = 10) {
+  #generateTrees() {
     const points = [
       ...this.roadBorders.map((s) => [s.p1, s.p2]).flat(),
       ...this.buildings.map((b) => b.points).flat(),
@@ -139,14 +143,15 @@ class World {
     ];
 
     const trees = [];
-    while (trees.length < count) {
+    let tryCount = 0;
+    while (tryCount < 50) {
       // randomly generate trees with lerp
       const p = new Point(
         lerp(left, right, Math.random()),
         lerp(bottom, top, Math.random())
       );
 
-      // however we don't want to trees on the buildings and roads and need to consider the tree size
+      // we don't want to trees on the buildings and roads and need to consider the tree size
       let keep = true;
       for (const poly of illegalPolys) {
         if (
@@ -161,20 +166,36 @@ class World {
       // avoid trees intersect with each other
       if (keep) {
         for (const tree of trees) {
-          if (calculateDistance(tree, p) < this.treeSize) {
+          if (calculateDistance(tree.centerPoint, p) < this.treeSize) {
             keep = false;
             break;
           }
         }
       }
 
+      // we only want trees close to the buildings and roads
       if (keep) {
-        trees.push(p);
+        let closeToSomething = false;
+        for (const poly of illegalPolys) {
+          if (poly.polyDistanceToPoint(p) < this.treeSize * 2) {
+            closeToSomething = true;
+            break;
+          }
+        }
+        keep = closeToSomething;
       }
+
+      // update trees array and reset tryCount
+      if (keep) {
+        trees.push(new Tree(p, this.treeSize));
+        tryCount = 0;
+      }
+
+      tryCount++;
     }
     return trees;
   }
-  draw(ctx) {
+  draw(ctx, viewPoint) {
     // draw the road
     for (const env of this.envelopes) {
       // using same fill and stroke color so that we don't see the lines inside
@@ -204,7 +225,7 @@ class World {
 
     // draw trees (point)
     for (const tree of this.trees) {
-      tree.draw(ctx, { size: this.treeSize, color: "rgba(0,0,0,0.2)" });
+      tree.draw(ctx, viewPoint);
     }
   }
 }
