@@ -49,7 +49,7 @@ class World {
     this.roadBorders = Polygon.union(this.envelopes.map((e) => e.poly)); // this returns keptSegments
 
     // generate buildings
-    this.buildings = this.#generateBuildings(); // buildings are basically Polygons
+    this.buildings = this.#generateBuildings();
     // generate trees
     this.trees = this.#generateTrees();
   }
@@ -66,6 +66,7 @@ class World {
       );
     }
 
+    // lines
     const guides = Polygon.union(tmpEnvelopes.map((e) => e.poly));
 
     // discard segment that's too short
@@ -77,7 +78,7 @@ class World {
       }
     }
 
-    // divide segment line into multiple lines
+    // divide longer line into multiple shorter lines
     const supports = [];
     for (let seg of guides) {
       const len = seg.getLength() + this.spacing;
@@ -99,7 +100,7 @@ class World {
       }
     }
 
-    // generate bases polygon
+    // generate bases polygon from the supports array
     const bases = [];
     for (const seg of supports) {
       bases.push(new Envelope(seg, this.buildingWidth).poly);
@@ -119,16 +120,17 @@ class World {
       }
     }
 
-    // return tmpEnvelopes;
     // return guides;
     // return supports;
-    return bases;
+    // return bases // (bases are Polygons)
+    return bases.map((b) => new Building(b));
   }
 
+  // draw trees around buildings and roads
   #generateTrees() {
     const points = [
       ...this.roadBorders.map((s) => [s.p1, s.p2]).flat(),
-      ...this.buildings.map((b) => b.points).flat(),
+      ...this.buildings.map((b) => b.base.points).flat(),
     ];
     //console.log(points, "what is points");
 
@@ -138,7 +140,7 @@ class World {
     const bottom = Math.max(...points.map((p) => p.y));
 
     const illegalPolys = [
-      ...this.buildings,
+      ...this.buildings.map((b) => b.base),
       ...this.envelopes.map((e) => e.poly),
     ];
 
@@ -218,12 +220,12 @@ class World {
       seg.draw(ctx, { color: "#fff", width: 4, dashed: [8, 10] });
     }
 
-    // draw building
+    // draw building (pseudo 3D effect )
     for (const build of this.buildings) {
-      build.draw(ctx);
+      build.draw(ctx, viewPoint);
     }
 
-    // draw trees (point)
+    // draw trees (pseudo 3D effect )
     for (const tree of this.trees) {
       tree.draw(ctx, viewPoint);
     }
