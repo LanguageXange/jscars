@@ -25,12 +25,15 @@ class World {
     this.roadBorders = []; // for use to see the union result (i.e. remove overlapping segments)
     this.buildings = [];
     this.trees = [];
+    this.laneGuides = [];
+
     // generate the initial world
     this.generate();
   }
   generate() {
     // regenerate world (called in updateCanvas )
     this.envelopes.length = 0;
+    this.laneGuides.length = 0;
     for (const seg of this.graph.segments) {
       this.envelopes.push(
         new Envelope(seg, this.roadWidth, this.roadRoundness)
@@ -52,6 +55,21 @@ class World {
     this.buildings = this.#generateBuildings();
     // generate trees
     this.trees = this.#generateTrees();
+    // generate lane guides to visualize the lane ( to place the stop sign on the correct position)
+    this.laneGuides = this.#generateLaneGuides();
+
+    // road markings
+    this.markings = [];
+  }
+  #generateLaneGuides() {
+    const tmpEnvelopes = [];
+    for (const seg of this.graph.segments) {
+      tmpEnvelopes.push(
+        new Envelope(seg, this.roadWidth / 2, this.roadRoundness)
+      );
+    }
+    const segments = Polygon.union(tmpEnvelopes.map((e) => e.poly));
+    return segments;
   }
   //( draw envelopes around segments, find the union, get the roadborder , use that to draw polygon)
   #generateBuildings() {
@@ -229,6 +247,17 @@ class World {
     );
     for (const item of items) {
       item.draw(ctx, viewPoint);
+    }
+
+    // drawing lane guides
+    // better visualize where the stop sign should be
+    // for (const seg of this.laneGuides) {
+    //   seg.draw(ctx, { color: "darkred", dashed: [10, 15] });
+    // }
+
+    // draw markings (e.g. stop sign)
+    for (const mark of this.markings) {
+      mark.draw(ctx);
     }
   }
 }

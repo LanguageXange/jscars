@@ -8,6 +8,7 @@ class StopEditor {
 
     this.mousePoint = null;
     this.intent = null;
+    this.markings = world.markings;
     this.#eventListener();
   }
 
@@ -34,12 +35,14 @@ class StopEditor {
     this.canvas.removeEventListener("contextmenu", this.boundContextMenu);
   }
 
+  // mouse move should see the stop sign intent
   #handleMouseMove(e) {
     this.mousePoint = this.viewport.getMouse(e, true);
     // as we move the mouse, we should indicate to the user which segment is the nearest to place the road sign
     const seg = getNearestSegment(
       this.mousePoint,
-      this.world.graph.segments,
+      // this.world.graph.segments,
+      this.world.laneGuides, // for stop sign we want to place it on either right or left lane
       10 * this.viewport.zoom
     );
     if (seg) {
@@ -53,7 +56,7 @@ class StopEditor {
         this.intent = new StopSign(
           proj.point,
           seg.directionVector(),
-          world.roadWidth,
+          world.roadWidth / 2,
           world.roadWidth / 2
         );
       } else {
@@ -64,11 +67,19 @@ class StopEditor {
     }
   }
 
-  #handleMouseDown() {}
+  #handleMouseDown(e) {
+    if (e.button === 0) {
+      // left click
+      if (this.intent) {
+        this.markings.push(this.intent); // world.js will draw the marking
+        this.intent = null;
+      }
+    }
+  }
 
   display() {
     if (this.intent) {
-      this.intent.draw(this.ctx, { color: "#4c0ffb" });
+      this.intent.draw(this.ctx);
     }
   }
 }
