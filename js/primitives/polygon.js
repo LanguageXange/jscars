@@ -73,6 +73,21 @@ class Polygon {
     return intersections;
   }
 
+  // check if two polygons intersects ( aka collides)
+  isIntersectsWith(poly) {
+    for (let s1 of this.segments) {
+      for (let s2 of poly.segments) {
+        if (getIntersection(s1.p1, s1.p2, s2.p1, s2.p2)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  polyDistanceToPoint(p) {
+    return Math.min(...this.segments.map((s) => s.distanceToPoint(p)));
+  }
   // similar to ray casting
   containsPoint(point) {
     const outerPoint = new Point(-2000, -2000);

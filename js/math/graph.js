@@ -21,6 +21,9 @@ class Graph {
     return new Graph(points, segments);
   }
 
+  hash() {
+    return JSON.stringify(this);
+  }
   addPoint(newpoint) {
     this.points.push(newpoint);
   }

@@ -33,6 +33,7 @@ const logger = new Logger(myCanvas, document.getElementById("action")); // for l
 const viewport = new Viewport(myCanvas, logger);
 const graphEditor = new GraphEditor(viewport, graph, logger);
 
+let currentGraphHash = graph.hash();
 updateCanvas();
 
 function updateCanvas() {
@@ -44,10 +45,14 @@ function updateCanvas() {
   // new Polygon(graph.points).draw(ctx); // for testing polygon
   // new Envelope(graph.segments[0], 80).draw(ctx); // for testing
 
-  // next step - generate world
-  world.generate();
+  // next step - (re)generate world but only when things are updated !
+  if (graph.hash() !== currentGraphHash) {
+    world.generate();
+    currentGraphHash = graph.hash();
+  }
+
   world.draw(ctx);
-  // ctx.globalAlpha = 0.5; // add transparency
+  ctx.globalAlpha = 0.5; // add transparency so that graphEditor (node and segment is less obvious)
   graphEditor.display();
 
   requestAnimationFrame(updateCanvas);

@@ -11,6 +11,29 @@ class Segment {
   directionVector() {
     return normalize(subtractOffset(this.p2, this.p1));
   }
+
+  // formula explained here -  https://www.youtube.com/watch?v=jvqomjmMsPI
+  distanceToPoint(point) {
+    const proj = this.projectPoint(point);
+    if (proj.offset > 0 && proj.offset < 1) {
+      return calculateDistance(point, proj.point);
+    }
+    const distToP1 = calculateDistance(point, this.p1);
+    const distToP2 = calculateDistance(point, this.p2);
+    return Math.min(distToP1, distToP2);
+  }
+
+  projectPoint(point) {
+    const a = subtractOffset(point, this.p1);
+    const b = subtractOffset(this.p2, this.p1);
+    const normB = normalize(b);
+    const scaler = dot(a, normB);
+    const proj = {
+      point: addOffset(this.p1, scale(normB, scaler)),
+      offset: scaler / magnitude(b),
+    };
+    return proj;
+  }
   // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
   draw(ctx, { width = 2, color = "#dcdcdc90", dashed = [] } = {}) {
     ctx.beginPath();
