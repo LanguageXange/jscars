@@ -3,6 +3,9 @@ class Building {
     this.base = basePoly;
     this.heightCoef = heightCoef;
   }
+  static load(info) {
+    return new Building(Polygon.load(info.base), info.heightCoef);
+  }
 
   draw(ctx, viewPoint) {
     // same formula as in tree.js

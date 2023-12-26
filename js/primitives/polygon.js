@@ -9,6 +9,10 @@ class Polygon {
     }
   }
 
+  static load(polyInfo) {
+    return new Polygon(polyInfo.points.map((p) => new Point(p.x, p.y)));
+  }
+
   // basically merging overlapping envelopes
   static union(polys) {
     Polygon.multiBreak(polys);

@@ -31,6 +31,34 @@ class World {
     // generate the initial world
     this.generate();
   }
+
+  // loading the world
+  static load(info) {
+    const world = new World(new Graph());
+    world.graph = Graph.load(info.graph);
+    world.roadWidth = info.roadWidth;
+    world.roadRoundness = info.roadRoundness;
+    world.buildingWidth = info.buildingWidth;
+    world.buildingMinLength = info.buildingMinLength;
+    world.spacing = info.spacing;
+    world.treeSize = info.treeSize;
+
+    world.envelopes = info.envelopes.map((e) => Envelope.load(e));
+    world.roadBorders = info.roadBorders.map((rb) => new Segment(rb.p1, rb.p2));
+    world.buildings = info.buildings.map((b) => Building.load(b));
+    world.trees = info.trees.map((t) => new Tree(t.centerPoint, info.treeSize)); // ensure the trees stay the same when we refresh
+
+    world.laneGuides = info.laneGuides.map(
+      (guide) => new Segment(guide.p1, guide.p2)
+    );
+    // we need a way to know what type of marking this is
+    world.markings = info.markings.map((m) => Marking.load(m));
+
+    // ensure zoom and offset remain the same ( see `save` function in script2.js )
+    world.zoom = info.zoom;
+    world.offset = info.offset;
+    return world;
+  }
   generate() {
     // regenerate world (called in updateCanvas )
     this.envelopes.length = 0;

@@ -2,11 +2,18 @@ console.log("envelop");
 class Envelope {
   // draw road based on segment aka skeleton
   constructor(skeleton, width, roundness = 0) {
-    this.skeleton = skeleton;
-
-    this.poly = this.#generatePolygon(width, roundness);
+    if (skeleton) {
+      this.skeleton = skeleton;
+      this.poly = this.#generatePolygon(width, roundness);
+    }
   }
 
+  static load(info) {
+    const env = new Envelope();
+    env.skeleton = new Segment(info.skeleton.p1, info.skeleton.p2);
+    env.poly = Polygon.load(info.poly);
+    return env;
+  }
   #generatePolygon(width, roundness) {
     const { p1, p2 } = this.skeleton;
     const radius = width / 2;

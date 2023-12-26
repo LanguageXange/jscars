@@ -1,12 +1,13 @@
 class Viewport {
-  constructor(canvas, logger) {
+  constructor(canvas, zoom = 1, offset = null, logger) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.logger = logger;
 
-    this.zoom = 1;
+    // ensure zoom and offset are the same when we save the world and load the world or refresh the page
+    this.zoom = zoom;
     this.center = new Point(canvas.width / 2, canvas.height / 2);
-    this.offset = scale(this.center, -1); // util function
+    this.offset = offset ? offset : scale(this.center, -1);
     //this.offset = new Point(0, 0); //
 
     this.drag = {

@@ -8,33 +8,22 @@ const graphBtn = document.getElementById("graph-btn");
 const stopBtn = document.getElementById("stop-btn");
 const crossingBtn = document.getElementById("crossing-btn");
 const startBtn = document.getElementById("start-btn");
+const fileInput = document.getElementById("fileInput");
 
 myCanvas.width = 800;
 myCanvas.height = 800;
-
 const ctx = myCanvas.getContext("2d");
 
-const p1 = new Point(200, 200);
-const p2 = new Point(400, 200);
-const p3 = new Point(500, 400);
-const p4 = new Point(100, 300);
-const points = [p1, p2, p3, p4];
-const seg1 = new Segment(p1, p2);
-const seg2 = new Segment(p2, p3);
-const seg3 = new Segment(p1, p4);
-const seg4 = new Segment(p3, p4);
-const segments = [seg1, seg2, seg3, seg4];
-// const graph = new Graph(points, segments);
-const graphString = localStorage.getItem("graph"); // if no localstorage it would be null
-const graphInfo = graphString ? JSON.parse(graphString) : null;
+const worldString = localStorage.getItem("world"); // if no localstorage it would be null
+const worldInfo = worldString ? JSON.parse(worldString) : null;
 
-const graph = graphInfo ? Graph.load(graphInfo) : new Graph();
+let world = worldInfo ? World.load(worldInfo) : new World(new Graph());
 
-const world = new World(graph);
+const graph = world.graph;
 
 const logger = new Logger(myCanvas, document.getElementById("action")); // for logging
 
-const viewport = new Viewport(myCanvas, logger);
+const viewport = new Viewport(myCanvas, world.zoom, world.offset, logger);
 
 // grouping editors into tools object
 const tools = {
@@ -102,8 +91,41 @@ function dispose() {
   world.markings.length = 0; // delete road markings
 }
 function save() {
-  localStorage.setItem("graph", JSON.stringify(graph));
+  // saving zoom level
+  world.zoom = viewport.zoom;
+  world.offset = viewport.offset;
+
+  const element = document.createElement("a");
+  element.setAttribute(
+    "href",
+    "data:application/json;charset=utf-8," +
+      encodeURIComponent(JSON.stringify(world))
+  );
+
+  const fileName = "name.world";
+  element.setAttribute("download", fileName);
+  element.click();
+  localStorage.setItem("world", JSON.stringify(world));
 }
+
+function loadFile(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    alert("no file selected");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.readAsText(file);
+  reader.onload = (e) => {
+    const fileContent = e.target.result;
+    const jsonData = JSON.parse(fileContent);
+    world = World.load(jsonData);
+    localStorage.setItem("world", JSON.stringify(world));
+    location.reload(); // reload the page
+  };
+}
+fileInput.addEventListener("change", loadFile);
 saveBtn.addEventListener("click", save);
 deleteBtn.addEventListener("click", dispose);
 

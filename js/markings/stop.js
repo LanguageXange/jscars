@@ -2,6 +2,7 @@ class StopSign extends Marking {
   constructor(projectPoint, directionVector, width, height) {
     super(projectPoint, directionVector, width, height);
     this.border = this.poly.segments[2];
+    this.type = "stop";
   }
 
   draw(ctx) {
