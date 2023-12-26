@@ -1,18 +1,6 @@
-class StopSign {
+class StopSign extends Marking {
   constructor(projectPoint, directionVector, width, height) {
-    this.projectPoint = projectPoint; // center point
-    this.directionVector = directionVector;
-    this.width = width;
-    this.height = height;
-
-    // half of the heigth toward the front & toward the back of the segment
-    this.support = new Segment(
-      translate(projectPoint, getAngle(directionVector), height / 2),
-      translate(projectPoint, getAngle(directionVector), -height / 2)
-    );
-
-    this.poly = new Envelope(this.support, width, 0).poly; // this will span the entire road width
-
+    super(projectPoint, directionVector, width, height);
     this.border = this.poly.segments[2];
   }
 
