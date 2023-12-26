@@ -1,4 +1,4 @@
-class StopEditor {
+class CrossingEditor {
   constructor(viewport, world) {
     this.viewport = viewport;
     this.world = world;
@@ -41,8 +41,7 @@ class StopEditor {
     // as we move the mouse, we should indicate to the user which segment is the nearest to place the road sign
     const seg = getNearestSegment(
       this.mousePoint,
-      // this.world.graph.segments,
-      this.world.laneGuides, // for stop sign we want to place it on either right or left lane
+      this.world.graph.segments,
       10 * this.viewport.zoom
     );
     if (seg) {
@@ -53,10 +52,10 @@ class StopEditor {
       if (proj.offset >= 0 && proj.offset <= 1) {
         // this.intent = proj.point;
 
-        this.intent = new StopSign(
+        this.intent = new Crossing(
           proj.point,
           seg.directionVector(),
-          world.roadWidth / 2,
+          world.roadWidth,
           world.roadWidth / 2
         );
       } else {

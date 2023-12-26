@@ -26,7 +26,8 @@ class World {
     this.buildings = [];
     this.trees = [];
     this.laneGuides = [];
-
+    // road markings
+    this.markings = [];
     // generate the initial world
     this.generate();
   }
@@ -57,9 +58,6 @@ class World {
     this.trees = this.#generateTrees();
     // generate lane guides to visualize the lane ( to place the stop sign on the correct position)
     this.laneGuides = this.#generateLaneGuides();
-
-    // road markings
-    this.markings = [];
   }
   #generateLaneGuides() {
     const tmpEnvelopes = [];

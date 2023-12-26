@@ -6,6 +6,7 @@ const saveBtn = document.getElementById("save-btn");
 const deleteBtn = document.getElementById("delete-btn");
 const graphBtn = document.getElementById("graph-btn");
 const stopBtn = document.getElementById("stop-btn");
+const crossingBtn = document.getElementById("crossing-btn");
 
 myCanvas.width = 800;
 myCanvas.height = 800;
@@ -35,6 +36,7 @@ const logger = new Logger(myCanvas, document.getElementById("action")); // for l
 const viewport = new Viewport(myCanvas, logger);
 const graphEditor = new GraphEditor(viewport, graph, logger);
 const stopEditor = new StopEditor(viewport, world); // road markings / stop sign require info from world
+const crossingEditor = new CrossingEditor(viewport, world); //
 
 let currentGraphHash = graph.hash();
 
@@ -60,11 +62,12 @@ function updateCanvas() {
   ctx.globalAlpha = 0.5; // add transparency so that graphEditor & stopEditor (node and segment is less obvious)
   graphEditor.display();
   stopEditor.display();
+  crossingEditor.display();
 
   requestAnimationFrame(updateCanvas);
 }
 
-// button event handlers
+// BUTTON EVENT HANDLERS
 
 function setMode(mode) {
   disableEditors();
@@ -80,6 +83,12 @@ function setMode(mode) {
       stopEditor.enable();
       break;
 
+    case "crossing":
+      crossingBtn.style.filter = "none";
+      crossingBtn.style.background = "#fff";
+      crossingEditor.enable();
+      break;
+
     default:
       return null;
   }
@@ -92,10 +101,14 @@ function disableEditors() {
   stopBtn.style.background = "#888";
   stopBtn.style.filter = "grayscale(80%)";
   stopEditor.disable();
+  crossingBtn.style.background = "#888";
+  crossingBtn.style.filter = "grayscale(80%)";
+  crossingEditor.disable();
 }
 function dispose() {
   graphEditor.dispose();
   localStorage.removeItem("graph");
+  world.markings.length = 0; // delete road markings
 }
 function save() {
   localStorage.setItem("graph", JSON.stringify(graph));
@@ -104,3 +117,4 @@ saveBtn.addEventListener("click", save);
 deleteBtn.addEventListener("click", dispose);
 graphBtn.addEventListener("click", () => setMode("graph"));
 stopBtn.addEventListener("click", () => setMode("stop"));
+crossingBtn.addEventListener("click", () => setMode("crossing"));
