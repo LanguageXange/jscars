@@ -34,7 +34,7 @@ class World {
   generate() {
     // regenerate world (called in updateCanvas )
     this.envelopes.length = 0;
-    this.laneGuides.length = 0;
+
     for (const seg of this.graph.segments) {
       this.envelopes.push(
         new Envelope(seg, this.roadWidth, this.roadRoundness)
@@ -57,7 +57,9 @@ class World {
     // generate trees
     this.trees = this.#generateTrees();
     // generate lane guides to visualize the lane ( to place the stop sign on the correct position)
-    this.laneGuides = this.#generateLaneGuides();
+    this.laneGuides.length = 0;
+    // this.laneGuides = this.#generateLaneGuides() // this doesn't work sometimes (can't see stop sign)
+    this.laneGuides.push(...this.#generateLaneGuides());
   }
   #generateLaneGuides() {
     const tmpEnvelopes = [];

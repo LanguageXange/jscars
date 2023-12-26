@@ -8,7 +8,7 @@ class StopSign extends Marking {
     // this.support.draw(ctx, { color: "#000" }); // this is the line
     // this.poly.draw(ctx);  // this is for us to see the area of the stop sign
 
-    this.border.draw(ctx, { width: 5, color: "#fff" }); // the border in front of the 'STOP' text
+    //this.border.draw(ctx, { width: 5, color: "#fff" }); // the border in front of the 'STOP' text
 
     ctx.save();
     ctx.translate(this.projectPoint.x, this.projectPoint.y);

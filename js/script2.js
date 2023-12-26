@@ -7,6 +7,7 @@ const deleteBtn = document.getElementById("delete-btn");
 const graphBtn = document.getElementById("graph-btn");
 const stopBtn = document.getElementById("stop-btn");
 const crossingBtn = document.getElementById("crossing-btn");
+const startBtn = document.getElementById("start-btn");
 
 myCanvas.width = 800;
 myCanvas.height = 800;
@@ -34,9 +35,20 @@ const world = new World(graph);
 const logger = new Logger(myCanvas, document.getElementById("action")); // for logging
 
 const viewport = new Viewport(myCanvas, logger);
-const graphEditor = new GraphEditor(viewport, graph, logger);
-const stopEditor = new StopEditor(viewport, world); // road markings / stop sign require info from world
-const crossingEditor = new CrossingEditor(viewport, world); //
+
+// grouping editors into tools object
+const tools = {
+  graph: { button: graphBtn, editor: new GraphEditor(viewport, graph, logger) },
+  stop: { button: stopBtn, editor: new StopEditor(viewport, world) },
+  crossing: {
+    button: crossingBtn,
+    editor: new CrossingEditor(viewport, world),
+  },
+  start: {
+    button: startBtn,
+    editor: new StartEditor(viewport, world),
+  },
+};
 
 let currentGraphHash = graph.hash();
 
@@ -60,9 +72,10 @@ function updateCanvas() {
   const viewPoint = scale(viewport.getOffset(), -1);
   world.draw(ctx, viewPoint);
   ctx.globalAlpha = 0.5; // add transparency so that graphEditor & stopEditor (node and segment is less obvious)
-  graphEditor.display();
-  stopEditor.display();
-  crossingEditor.display();
+
+  for (const tool of Object.values(tools)) {
+    tool.editor.display();
+  }
 
   requestAnimationFrame(updateCanvas);
 }
@@ -71,42 +84,20 @@ function updateCanvas() {
 
 function setMode(mode) {
   disableEditors();
-  switch (mode) {
-    case "graph":
-      graphBtn.style.filter = "none";
-      graphBtn.style.background = "#fff";
-      graphEditor.enable();
-      break;
-    case "stop":
-      stopBtn.style.filter = "none";
-      stopBtn.style.background = "#fff";
-      stopEditor.enable();
-      break;
-
-    case "crossing":
-      crossingBtn.style.filter = "none";
-      crossingBtn.style.background = "#fff";
-      crossingEditor.enable();
-      break;
-
-    default:
-      return null;
-  }
+  tools[mode].button.style.filter = "none";
+  tools[mode].button.style.background = "#fff";
+  tools[mode].editor.enable();
 }
 
 function disableEditors() {
-  graphBtn.style.filter = "grayscale(80%)";
-  graphBtn.style.background = "#888";
-  graphEditor.disable();
-  stopBtn.style.background = "#888";
-  stopBtn.style.filter = "grayscale(80%)";
-  stopEditor.disable();
-  crossingBtn.style.background = "#888";
-  crossingBtn.style.filter = "grayscale(80%)";
-  crossingEditor.disable();
+  for (const tool of Object.values(tools)) {
+    tool.button.style.filter = "grayscale(80%)";
+    tool.button.style.background = "#888";
+    tool.editor.disable();
+  }
 }
 function dispose() {
-  graphEditor.dispose();
+  tools["graph"].editor.dispose();
   localStorage.removeItem("graph");
   world.markings.length = 0; // delete road markings
 }
@@ -115,6 +106,8 @@ function save() {
 }
 saveBtn.addEventListener("click", save);
 deleteBtn.addEventListener("click", dispose);
-graphBtn.addEventListener("click", () => setMode("graph"));
-stopBtn.addEventListener("click", () => setMode("stop"));
-crossingBtn.addEventListener("click", () => setMode("crossing"));
+
+// set mode buttons
+for (let [toolName, tool] of Object.entries(tools)) {
+  tool.button.addEventListener("click", () => setMode(toolName));
+}
